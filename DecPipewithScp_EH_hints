@@ -1,0 +1,2 @@
+for SCP command provide passwordless ssh connections between jenkins to QA and Prod servers
+change permissions of pther to tomcat9 by $ sudo chmod o+w -R tomcat9/
