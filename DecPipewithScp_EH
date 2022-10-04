@@ -1,0 +1,98 @@
+@Library('newlibrary')_
+pipeline
+{
+    agent any
+    stages
+    {
+        stage('ContinuousDownload')
+        {
+            steps{
+                script
+                {
+                    try
+                    {
+                        cicd.newGit("https://github.com/intelliqittrainings/maven.git")
+                    }
+                    catch(Exception e1)
+                    {
+                        mail bcc: '', body: 'jenkins unable to download the code from github', cc: '', from: '', replyTo: '', subject: 'download fails', to: 'dev.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+        stage('ContinuousBuild')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                        cicd.newMaven()
+                    }
+                    catch(Exception e2)
+                    {
+                        mail bcc: '', body: 'jenkins unable to build the artifact', cc: '', from: '', replyTo: '', subject: 'Build fails', to: 'buil.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+        stage('ContinuousDelpoyment')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                        cicd.newDeploy("PipelineJob","172.31.44.250","testapp")
+                    }
+                    catch(Exception e3)
+                    {
+                        mail bcc: '', body: 'jenkins unable to deploy the artifact', cc: '', from: '', replyTo: '', subject: 'deployment fails', to: 'deploy.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+        stage('ContinuousTesting')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                        cicd.newGit("https://github.com/intelliqittrainings/FunctionalTesting.git")
+                        cicd.runSelenium("PipelineJob")
+                    }
+                    catch(Exception e4)
+                    {
+                        mail bcc: '', body: 'jenkins unable to download the code', cc: '', from: '', replyTo: '', subject: 'download  fails', to: 'dev.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+        stage('ContinuousDeliver')
+        {
+            steps
+            {
+                script
+                {
+                    try
+                    {
+                        cicd.newDeploy("PipelineJob","172.31.35.250","prodapp")
+                    }
+                    catch(Exception e5)
+                    {
+                        mail bcc: '', body: 'jenkins unable to deliver', cc: '', from: '', replyTo: '', subject: 'delivery fails', to: 'prod.team@gmail.com'
+                        exit(1)
+                    }
+                }
+            }
+        }
+    }
+}
